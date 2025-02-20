@@ -1,8 +1,10 @@
 from dotenv import load_dotenv
-from prettytable.colortable import ColorTable, Themes
+from imports.movement import Movement
 
 import os
-import imports.print_utils as print_utils
+import imports.printer as printer
+import imports.ships as ships
+
 
 # Load the environment vars.
 load_dotenv()
@@ -10,17 +12,12 @@ load_dotenv()
 # Get the console width (default to 100).
 CONSOLE_WIDTH = int(os.getenv("CONSOLE_WIDTH")) or 100
 
-first_time_home = True
-first_time_hangar = True
+# The movement object handles moving between locations and status messages.
+movement_obj = Movement()
+movement_obj.set_breadcrumb("home")
+movement_obj.set_next_message("You wake up in your hab on ARC-L4 Faint Glen Station.")
 
-
-# Holds the current menu tree. Example values might be:
-# - hangar
-# - hangar/add
-# - hangar/remove
-# - admin
-current_menu_tree = "home"
-
+# TODO: Move this to ships.py and/or a Ship class.
 my_ships = [
     {
         "manufacturer": "DRAKE Interplanetary",
@@ -36,63 +33,29 @@ my_ships = [
     },
 ]
 
+waiting_for_input = True
+
 
 def get_user_selection():
     user_input = input("Selection: ")
     return user_input
 
 
-def print_my_ships_table():
-    table = ColorTable(theme=Themes.LAVENDER)
-    table.min_table_width = CONSOLE_WIDTH
-    table.align = "l"
-
-    table.field_names = ["ID", "Manufacturer", "Name", "Crew", "Cargo"]
-
-    table_rows = []
-
-    for index, ship in enumerate(my_ships):
-        table_rows.append(
-            [
-                index + 1,
-                ship["manufacturer"],
-                ship["name"],
-                ship["crew"],
-                ship["cargo"],
-            ]
-        )
-
-    table.add_rows(table_rows)
-
-    print(table)
-
-
-waiting_for_input = True
-
-print_utils.print_logo()
+printer.print_logo()
 
 while waiting_for_input:
-    if current_menu_tree == "home":
+    if movement_obj.get_breadcrumb() == "home":
         print()
-
-        if first_time_home:
-            print_utils.print_status(
-                "You wake up in your hab on ARC-L4 Faint Glen Station."
-            )
-        else:
-            print_utils.print_status("You return to your hab.")
-
-        first_time_home = False
-
+        printer.print_status(movement_obj.get_message())
         print()
-        print_utils.print_top_line()
-        print_utils.print_line("What would you like to do?")
-        print_utils.print_middle_line()
-        print_utils.print_line("1: Walk to the admin office.")
-        print_utils.print_line("2: Take the elevator to your hangar.")
-        print_utils.print_line("3: Open your log book.")
-        print_utils.print_line("q: Quit")
-        print_utils.print_bottom_line()
+        printer.print_top_line()
+        printer.print_line("What would you like to do?")
+        printer.print_middle_line()
+        printer.print_line("1: Walk to the admin office.")
+        printer.print_line("2: Take the elevator to your hangar.")
+        printer.print_line("3: Open your log book.")
+        printer.print_line("q: Quit")
+        printer.print_bottom_line()
 
         user_selection = get_user_selection()
 
@@ -100,45 +63,44 @@ while waiting_for_input:
             waiting_for_input = False
 
         if user_selection == "2":
-            current_menu_tree = "hangar"
+            movement_obj.set_breadcrumb("hangar")
+            movement_obj.set_next_message("You take the elevator to your hangar.")
 
-    if current_menu_tree == "hangar":
+    if movement_obj.get_breadcrumb() == "hangar":
         print()
-
-        if first_time_hangar:
-            print_utils.print_status("You take the elevator to your hangar.")
-        else:
-            print_utils.print_status("You return to your hangar.")
-
-        first_time_hangar = False
-
+        printer.print_status(movement_obj.get_message())
         print()
-        print_utils.print_top_line()
-        print_utils.print_line("What would you like to do?")
-        print_utils.print_middle_line()
-        print_utils.print_line("1: View your ships in the ASOP terminal.")
-        print_utils.print_line("2: Add a ship to your inventory.")
-        print_utils.print_line("3: Remove a ship from your inventory.")
-        print_utils.print_line("b: Back")
-        print_utils.print_bottom_line()
+        printer.print_top_line()
+        printer.print_line("What would you like to do?")
+        printer.print_middle_line()
+        printer.print_line("1: View your ships in the ASOP terminal.")
+        printer.print_line("2: Add a ship to your inventory.")
+        printer.print_line("3: Remove a ship from your inventory.")
+        printer.print_line("b: Back")
+        printer.print_bottom_line()
 
         user_selection = get_user_selection()
 
         if user_selection == "b":
-            current_menu_tree = "home"
+            movement_obj.set_breadcrumb("home")
+            movement_obj.set_next_message("You return to your hab.")
 
         if user_selection == "1":
             print()
-            print_utils.print_status(
-                "You use the ASOP terminal to view your list of ships."
+            printer.print_status(
+                "You use the ship terminal to view your list of ships."
             )
             print()
-            print_my_ships_table()
+            ships.print_my_ships_table(my_ships)
+
+            movement_obj.set_next_message(
+                "You power down the ship terminal. You are still in your hangar."
+            )
 
         if user_selection == "2":
-            current_menu_tree = "hangar/add"
+            movement_obj.set_breadcrumb("hangar/add")
 
-    if current_menu_tree == "hangar/add":
+    if movement_obj.get_breadcrumb() == "hangar/add":
         print()
 
         ship_manufacturer = (
@@ -159,6 +121,9 @@ while waiting_for_input:
         )
 
         print()
-        print_utils.print_success("Ship added to your inventory!")
+        printer.print_success("Ship added to your inventory!")
 
-        current_menu_tree = "hangar"
+        movement_obj.set_breadcrumb("hangar")
+        movement_obj.set_next_message(
+            "You are done adding a ship... Update this message..."
+        )
