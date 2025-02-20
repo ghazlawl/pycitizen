@@ -3,7 +3,7 @@ from imports.movement import Movement
 
 import os
 import imports.printer as printer
-import imports.ships as ships
+import imports.hangar as hangar
 
 
 # Load the environment vars.
@@ -16,22 +16,6 @@ CONSOLE_WIDTH = int(os.getenv("CONSOLE_WIDTH")) or 100
 movement_obj = Movement()
 movement_obj.set_breadcrumb("home")
 movement_obj.set_next_message("You wake up in your hab on ARC-L4 Faint Glen Station.")
-
-# TODO: Move this to ships.py and/or a Ship class.
-my_ships = [
-    {
-        "manufacturer": "DRAKE Interplanetary",
-        "name": "Cutlass Black Best In Show Edition 2949",
-        "crew": "1-2",
-        "cargo": "46",
-    },
-    {
-        "manufacturer": "Origin Jumpworks",
-        "name": "400i",
-        "crew": "1-3",
-        "cargo": "42",
-    },
-]
 
 waiting_for_input = True
 
@@ -87,14 +71,14 @@ while waiting_for_input:
 
         if user_selection == "1":
             print()
-            printer.print_status(
-                "You use the ship terminal to view your list of ships."
-            )
+            printer.print_status("You use the terminal to view your list of ships.")
             print()
-            ships.print_my_ships_table(my_ships)
+
+            my_ships = hangar.load_my_ships()
+            hangar.print_my_ships_table(my_ships)
 
             movement_obj.set_next_message(
-                "You power down the ship terminal. You are still in your hangar."
+                "You power down the terminal. You are still in your hangar."
             )
 
         if user_selection == "2":
@@ -109,7 +93,9 @@ while waiting_for_input:
         )
         ship_name = input("Ship Name [Cutter]: ") or "Cutter"
         ship_crew = input("Ship Crew [1]: ") or "1"
-        ship_cargo = input("Ship Cargo (SCU) [0]: ") or "0"
+        ship_cargo = int(input("Ship Cargo (SCU) [0]: ")) or 0
+
+        my_ships = hangar.load_my_ships()
 
         my_ships.append(
             {
@@ -119,6 +105,8 @@ while waiting_for_input:
                 "cargo": ship_cargo,
             }
         )
+
+        hangar.save_my_ships(my_ships)
 
         print()
         printer.print_success("Ship added to your inventory!")
