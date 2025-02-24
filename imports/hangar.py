@@ -20,7 +20,7 @@ def load_my_ships():
         return data
     except FileNotFoundError:
         print(f'The file "{filename}" does not exist.')
-        return None
+        return []
     except json.JSONDecodeError:
         print(f'The file "{filename}" is not a valid JSON file.')
         return None

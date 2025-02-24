@@ -1,22 +1,27 @@
-import os
+from imports.settings import Settings
 
-from dotenv import load_dotenv
+my_bcolors = {
+    "BLACK": "\033[30m",
+    "RED": "\33[91m",
+    "GREEN": "\033[32m",
+    "YELLOW": "\033[93m",
+    "BLUE": "\33[94m",
+    "PURPLE": "\033[0;35m",
+    "CYAN": "\033[36m",
+    "WHITE": "\033[37m",
+    "END": "\033[0m",
+    "GRAY": "\033[38;5;8m",
+}
 
-# Load the environment vars.
-load_dotenv()
+my_beffects = {
+    "BOLD": "\033[1m",
+    "UNDERLINE": "\033[4m",
+    "BLINKING": "\033[5m",
+    "REVERSED": "\033[7m",
+    "Hidden": "\033[8m",
+}
 
-# Get the console width (default to 100).
-CONSOLE_WIDTH = int(os.getenv("CONSOLE_WIDTH")) or 100
-
-
-class bcolors:
-    RED = "\33[91m"
-    BLUE = "\33[94m"
-    GREEN = "\033[32m"
-    YELLOW = "\033[93m"
-    PURPLE = "\033[0;35m"
-    CYAN = "\033[36m"
-    END = "\033[0m"
+settings_obj = Settings()
 
 
 def print_logo():
@@ -44,22 +49,41 @@ def print_top_line():
     Prints a top line.
 
     See: https://theasciicode.com.ar/extended-ascii-code/box-drawing-character-single-line-lower-left-corner-ascii-code-192.html
+    See: https://en.wikipedia.org/wiki/Box-drawing_characters
     """
-    print("+" + ("-" * (CONSOLE_WIDTH - 2)) + "+")
+    border_color = my_bcolors[settings_obj.get("border_color")]
+    width = settings_obj.get("console_width")
+    char1 = settings_obj.get("border_tl_junction_char")
+    char2 = settings_obj.get("border_horizontal_char")
+    char3 = settings_obj.get("border_tr_junction_char")
+
+    print(f"{border_color}{char1}{char2 * (width - 2)}{char3}{my_bcolors['END']}")
 
 
 def print_middle_line():
     """
     Prints a middle line.
     """
-    print("+" + ("-" * (CONSOLE_WIDTH - 2)) + "+")
+    border_color = my_bcolors[settings_obj.get("border_color")]
+    width = settings_obj.get("console_width")
+    char1 = settings_obj.get("border_l_junction_char")
+    char2 = settings_obj.get("border_horizontal_char")
+    char3 = settings_obj.get("border_r_junction_char")
+
+    print(f"{border_color}{char1}{char2 * (width - 2)}{char3}{my_bcolors['END']}")
 
 
 def print_bottom_line():
     """
     Prints a bottom line.
     """
-    print("+" + ("-" * (CONSOLE_WIDTH - 2)) + "+")
+    border_color = my_bcolors[settings_obj.get("border_color")]
+    width = settings_obj.get("console_width")
+    char1 = settings_obj.get("border_bl_junction_char")
+    char2 = settings_obj.get("border_horizontal_char")
+    char3 = settings_obj.get("border_br_junction_char")
+
+    print(f"{border_color}{char1}{char2 * (width - 2)}{char3}{my_bcolors['END']}")
 
 
 def print_line(text):
@@ -69,30 +93,21 @@ def print_line(text):
     Arguments:
       text - The text to print.
     """
+    border_color = my_bcolors[settings_obj.get("border_color")]
+    width = settings_obj.get("console_width")
+    text_color = my_bcolors[settings_obj.get("text_color")]
+    char1 = settings_obj.get("border_vertical_char")
+
     print(
-        "|",
-        "{value:{width}}".format(value=text, width=(CONSOLE_WIDTH - 4)),
-        "|",
+        f"{border_color}{char1}{my_bcolors['END']}",
+        f"{text_color}{text:{(width - 4)}}{my_bcolors['END']}",
+        f"{border_color}{char1}{my_bcolors['END']}",
     )
 
 
-def print_breadcrumbs(menu_tree):
-    """
-    Prints the specified menu tree in the format: "You are here: X > Y > Z". For
-    example, the menu tree "ships/view" will be printed as "Ships > View".
-
-    Arguments:
-      menu_tree (str) - The menu tree. Example: ships/view
-    """
-    split_words = menu_tree.split("/")
-    capitalized_words = [word.capitalize() for word in split_words]
-
-    print("You are here:", " > ".join(capitalized_words))
-
-
 def print_success(text):
-    print(f"{bcolors.GREEN}{text}{bcolors.END}")
+    print(f"{my_bcolors['GREEN']}{text}{my_bcolors['END']}")
 
 
 def print_status(text):
-    print(f"{bcolors.YELLOW}{text}{bcolors.END}")
+    print(f"{my_bcolors['YELLOW']}{text}{my_bcolors['END']}")

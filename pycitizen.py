@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from imports.movement import Movement
+from imports.ledger import SalvageLedger
 
 import os
 import imports.printer as printer
@@ -16,6 +17,9 @@ CONSOLE_WIDTH = int(os.getenv("CONSOLE_WIDTH")) or 100
 movement_obj = Movement()
 movement_obj.set_breadcrumb("home")
 movement_obj.set_next_message("You wake up in your hab on ARC-L4 Faint Glen Station.")
+
+# The salvage ledger object handles salvage operations.
+salvage_ledger_obj = SalvageLedger()
 
 waiting_for_input = True
 
@@ -37,7 +41,7 @@ while waiting_for_input:
         printer.print_middle_line()
         printer.print_line("1: Walk to the admin office.")
         printer.print_line("2: Take the elevator to your hangar.")
-        printer.print_line("3: Open your log book.")
+        printer.print_line("3: Open your ledger.")
         printer.print_line("q: Quit")
         printer.print_bottom_line()
 
@@ -49,6 +53,10 @@ while waiting_for_input:
         if user_selection == "2":
             movement_obj.set_breadcrumb("hangar")
             movement_obj.set_next_message("You take the elevator to your hangar.")
+
+        if user_selection == "3":
+            movement_obj.set_breadcrumb("ledger")
+            movement_obj.set_next_message("You open your ledger.")
 
     if movement_obj.get_breadcrumb() == "hangar":
         print()
@@ -64,6 +72,9 @@ while waiting_for_input:
         printer.print_bottom_line()
 
         user_selection = get_user_selection()
+
+        if user_selection == "q":
+            waiting_for_input = False
 
         if user_selection == "b":
             movement_obj.set_breadcrumb("home")
@@ -115,3 +126,64 @@ while waiting_for_input:
         movement_obj.set_next_message(
             "You are done adding a ship... Update this message..."
         )
+
+    if movement_obj.get_breadcrumb() == "ledger":
+        print()
+        printer.print_status(movement_obj.get_message())
+        print()
+        printer.print_top_line()
+        printer.print_line("Which ledger would you like to view?")
+        printer.print_middle_line()
+        printer.print_line("1: Hauling")
+        printer.print_line("2: Mining")
+        printer.print_line("3: Salvage")
+        printer.print_line("b: Back")
+        printer.print_bottom_line()
+
+        user_selection = get_user_selection()
+
+        if user_selection == "q":
+            waiting_for_input = False
+
+        if user_selection == "b":
+            movement_obj.set_breadcrumb("home")
+            movement_obj.set_next_message("You return to your hab.")
+
+        if user_selection == "3":
+            movement_obj.set_breadcrumb("ledger/salvage")
+            movement_obj.set_next_message(
+                "You black out and wake up on your favorite salvage ship."
+            )
+
+    if movement_obj.get_breadcrumb() == "ledger/salvage":
+        print()
+        printer.print_status(movement_obj.get_message())
+        print()
+        printer.print_top_line()
+        printer.print_line("What would you like to do?")
+        printer.print_middle_line()
+        printer.print_line("1: Check the filler station material levels.")
+        printer.print_line("b: Back")
+        printer.print_bottom_line()
+
+        user_selection = get_user_selection()
+
+        if user_selection == "q":
+            waiting_for_input = False
+
+        if user_selection == "b":
+            movement_obj.set_breadcrumb("ledger")
+            movement_obj.set_next_message("You black out and wake up back in your hab.")
+
+        if user_selection == "1":
+            print()
+            printer.print_status(
+                "You walk over to the filler station and check the levels."
+            )
+            print()
+
+            salvage_ledger_obj.print_station_values()
+
+            movement_obj.set_next_message(
+                "You leave the station. You are still on your favorite salvage ship."
+            )
