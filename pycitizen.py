@@ -168,7 +168,9 @@ while waiting_for_input:
         printer.print_top_line()
         printer.print_line("What would you like to do?")
         printer.print_middle_line()
-        printer.print_line("1: Check filler station levels.")
+        printer.print_line("1: View recorded salvage activity.")
+        printer.print_line("2: Record new salvage activity to your notebook.")
+        printer.print_line("3: Check filler station levels.")
         printer.print_line("b: Back")
         printer.print_bottom_line()
 
@@ -183,12 +185,23 @@ while waiting_for_input:
 
         if user_selection == "1":
             print()
+            printer.print_status("You open your notebook.")
+            print()
+
+            salvage_ledger_obj.print_activity_table()
+
+            movement_obj.set_next_message(
+                "You close your notebook. You are still on your salvage ship."
+            )
+
+        if user_selection == "3":
+            print()
             printer.print_status(
                 "You walk over to the filler station and check the levels."
             )
             print()
 
-            salvage_ledger_obj.print_station_values()
+            salvage_ledger_obj.print_station_values_table()
 
             movement_obj.set_next_message(
                 "You leave the station. You are still on your salvage ship."

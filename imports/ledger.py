@@ -1,3 +1,4 @@
+import json
 import os
 
 from dotenv import load_dotenv
@@ -11,6 +12,8 @@ CONSOLE_WIDTH = int(os.getenv("CONSOLE_WIDTH")) or 100
 
 
 class Ledger:
+    data = None
+
     filename = "unknown-ledger.json"
 
     def __init__(self, filename):
@@ -26,6 +29,19 @@ class SalvageLedger(Ledger):
 
     def __init__(self):
         super().__init__("salvage-ledger.json")
+        self.data = self.load_data()
+
+    def load_data(self):
+        try:
+            with open("files/" + self.filename, "r") as file:
+                data = json.load(file)
+            return data
+        except FileNotFoundError:
+            print(f'The file "{self.filename}" does not exist.')
+            return None
+        except json.JSONDecodeError:
+            print(f'The file "{self.filename}" is not a valid JSON file.')
+            return None
 
     def set_current_station_value(self, material_to_update, new_amount):
         for item in self.current_station_values:
@@ -51,7 +67,7 @@ class SalvageLedger(Ledger):
 
         return amount
 
-    def print_station_values(self):
+    def print_station_values_table(self):
         table = ColorTable(theme=Themes.LAVENDER)
         table.min_table_width = CONSOLE_WIDTH
         table.align = "l"
@@ -65,6 +81,62 @@ class SalvageLedger(Ledger):
                 [
                     value["material"],
                     value["amount"],
+                ]
+            )
+
+        table.add_rows(table_rows)
+
+        print(table)
+
+    def print_activity_table(self):
+        print(self.data["activity"])
+
+        table = ColorTable(theme=Themes.LAVENDER)
+        table.min_table_width = CONSOLE_WIDTH
+        table.align = "l"
+
+        table.field_names = [
+            "Date",
+            "Cost",
+            "What",
+            "RMC",
+            "RMC Profit",
+            "CMAT",
+            "CMAT Profit",
+            "Cargo",
+            "Cargo Profit",
+            "Total Profit",
+        ]
+
+        table_rows = []
+
+        for index, value in enumerate(self.data["activity"]):
+            # Extract the amount of RMC.
+            rmc_scu = next(
+                item["amount"]
+                for item in value["commodities"]
+                if item["commodity"] == "Recycled Material Composite"
+            )
+
+            # Extract the amount of CMAT.
+            cmat_scu = next(
+                item["amount"]
+                for item in value["commodities"]
+                if item["commodity"] == "Construction Materials"
+            )
+
+            table_rows.append(
+                [
+                    value["date"],
+                    f"{value['cost']:,} UEC",
+                    value["what"],
+                    f"{rmc_scu:.2f} SCU",
+                    "?",
+                    f"{cmat_scu:.2f} SCU",
+                    "?",
+                    "?",
+                    "?",
+                    "?",
                 ]
             )
 
