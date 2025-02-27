@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 from imports.movement import Movement
-from imports.ledger import SalvageLedger
+from imports.ledgers import SalvageLedger
 
 import os
 import imports.printer as printer
