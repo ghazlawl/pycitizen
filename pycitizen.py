@@ -41,7 +41,7 @@ while waiting_for_input:
         printer.print_middle_line()
         printer.print_line("1: Walk to the admin office.")
         printer.print_line("2: Take the elevator to your hangar.")
-        printer.print_line("3: Open your ledger.")
+        printer.print_line("3: Go make some money.")
         printer.print_line("q: Quit")
         printer.print_bottom_line()
 
@@ -132,11 +132,17 @@ while waiting_for_input:
         printer.print_status(movement_obj.get_message())
         print()
         printer.print_top_line()
-        printer.print_line("Which ledger would you like to view?")
+        printer.print_line("What would you like to do?")
         printer.print_middle_line()
-        printer.print_line("1: Hauling")
-        printer.print_line("2: Mining")
-        printer.print_line("3: Salvage")
+        printer.print_line(
+            "1: Transport rare resources across the vast expanse of the galaxy."
+        )
+        printer.print_line(
+            "2: Extract precious minerals from asteroids orbiting distant stars."
+        )
+        printer.print_line(
+            "3: Salvage valuable technology from derelict ships drifting in deep space."
+        )
         printer.print_line("b: Back")
         printer.print_bottom_line()
 
@@ -152,7 +158,7 @@ while waiting_for_input:
         if user_selection == "3":
             movement_obj.set_breadcrumb("ledger/salvage")
             movement_obj.set_next_message(
-                "You black out and wake up on your favorite salvage ship."
+                "You are now in your salvage ship. Scanners indicate that you are in deep space."
             )
 
     if movement_obj.get_breadcrumb() == "ledger/salvage":
@@ -162,7 +168,7 @@ while waiting_for_input:
         printer.print_top_line()
         printer.print_line("What would you like to do?")
         printer.print_middle_line()
-        printer.print_line("1: Check the filler station material levels.")
+        printer.print_line("1: Check filler station levels.")
         printer.print_line("b: Back")
         printer.print_bottom_line()
 
@@ -185,5 +191,5 @@ while waiting_for_input:
             salvage_ledger_obj.print_station_values()
 
             movement_obj.set_next_message(
-                "You leave the station. You are still on your favorite salvage ship."
+                "You leave the station. You are still on your salvage ship."
             )

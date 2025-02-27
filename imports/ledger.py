@@ -20,8 +20,8 @@ class Ledger:
 
 class SalvageLedger(Ledger):
     current_station_values = [
-        {"material": "RMC", "amount": 1.2},
-        {"material": "CMAT", "amount": 2.3},
+        {"material": "Recycled Material Composite", "amount": 1.2},
+        {"material": "Construction Materials", "amount": 2.3},
     ]
 
     def __init__(self):
@@ -56,7 +56,7 @@ class SalvageLedger(Ledger):
         table.min_table_width = CONSOLE_WIDTH
         table.align = "l"
 
-        table.field_names = ["Material", "Amount"]
+        table.field_names = ["Material", "Amount (SCU)"]
 
         table_rows = []
 
