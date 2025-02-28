@@ -140,10 +140,10 @@ while waiting_for_input:
             "1: Transport rare resources across the vast expanse of the galaxy."
         )
         printer.print_line(
-            "2: Extract precious minerals from asteroids orbiting distant stars."
+            "2: Salvage valuable technology from derelict ships drifting in deep space."
         )
         printer.print_line(
-            "3: Salvage valuable technology from derelict ships drifting in deep space."
+            "3: Extract precious minerals from asteroids orbiting distant stars."
         )
         printer.print_line("b: Back")
         printer.print_bottom_line()
@@ -157,7 +157,7 @@ while waiting_for_input:
             movement_obj.set_breadcrumb("home")
             movement_obj.set_next_message("You return to your hab.")
 
-        if user_selection == "3":
+        if user_selection == "2":
             movement_obj.set_breadcrumb("ledger/salvage")
             movement_obj.set_next_message(
                 "You are now in your salvage ship. Scanners indicate that you are in deep space."
@@ -202,46 +202,19 @@ while waiting_for_input:
             now = datetime.now().strftime("%m/%d/%y")
             date = input(f"Date [{now}]: ") or datetime.now().strftime("%m/%d/%y")
             cost = input("Cost [0]: ") or "0"
-            what = input("Object [ie, Freelancer MIS, Reliant]: ")
-            rmc_amount = input("RMC Amount [0]: ") or "0"
-            cmat_amount = input("CMAT Amount [0]: ") or "0"
-            cargo = input("Cargo ['2 Gold', '1 Quantanium', etc]: ") or ""
+            what = input("Object [e.g., Avenger, Reliant, etc]: ") or "Unknown"
+            amount_rmc = input("RMC Amount [0]: ") or "0"
+            amount_cmat = input("CMAT Amount [0]: ") or "0"
+            cargo = input("Cargo [e.g., '2 Gold', '1 Iron', etc]: ") or ""
 
-            cargo_items = cargo.split(",")
-            cargo_items_list = [
-                {
-                    "commodity": "Recycled Material Composite",
-                    "amount": int(rmc_amount),
-                },
-                {
-                    "commodity": "Construction Materials",
-                    "amount": int(cmat_amount),
-                },
-            ]
-
-            for item in cargo_items:
-                # Split by space to separate the quantity and the commodity.
-                quantity, commodity = item.split()
-
-                # Create a dictionary for each commodity.
-                commodity_object = {
-                    "commodity": commodity,
-                    "amount": int(quantity),
-                }
-
-                # Add the commodity object to the list of cargo items.
-                cargo_items_list.append(commodity_object)
-
-            # Format the row to save.
-            row = {
-                "date": date,
-                "cost": int(cost),
-                "what": what,
-                "commodities": cargo_items_list,
-            }
-
-            salvage_ledger_obj.add_activity(row)
-            salvage_ledger_obj.save_data()
+            salvage_ledger_obj.add_activity(
+                date=date,
+                cost=int(cost),
+                what=what,
+                amount_rmc=float(amount_rmc),
+                amount_cmt=float(amount_cmat),
+                cargo=cargo,
+            )
 
             print()
             printer.print_success("Salvage activity logged to your notebook!")
