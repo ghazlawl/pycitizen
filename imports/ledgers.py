@@ -44,6 +44,16 @@ class SalvageLedger(Ledger):
             print(f'The file "{self.filename}" is not a valid JSON file.')
             return None
 
+    def add_activity(self, row):
+        self.data["activity"].append(row)
+
+    def save_data(self):
+        try:
+            with open("files/" + self.filename, "w") as file:
+                json.dump(self.data, file, indent=4)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
     def set_current_station_value(self, material_to_update, new_amount):
         for item in self.current_station_values:
             if item["material"] == material_to_update:

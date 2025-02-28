@@ -1,8 +1,10 @@
+from datetime import datetime
 from dotenv import load_dotenv
+import os
+
 from imports.movement import Movement
 from imports.ledgers import SalvageLedger
 
-import os
 import imports.printer as printer
 import imports.hangar as hangar
 
@@ -190,6 +192,64 @@ while waiting_for_input:
 
             salvage_ledger_obj.print_activity_table()
 
+            movement_obj.set_next_message(
+                "You close your notebook. You are still on your salvage ship."
+            )
+
+        if user_selection == "2":
+            print()
+
+            now = datetime.now().strftime("%m/%d/%y")
+            date = input(f"Date [{now}]: ") or datetime.now().strftime("%m/%d/%y")
+            cost = input("Cost [0]: ") or "0"
+            what = input("Object [ie, Freelancer MIS, Reliant]: ")
+            rmc_amount = input("RMC Amount [0]: ") or "0"
+            cmat_amount = input("CMAT Amount [0]: ") or "0"
+            cargo = input("Cargo ['2 Gold', '1 Quantanium', etc]: ") or ""
+
+            cargo_items = cargo.split(",")
+            cargo_items_list = [
+                {
+                    "commodity": "Recycled Material Composite",
+                    "amount": int(rmc_amount),
+                },
+                {
+                    "commodity": "Construction Materials",
+                    "amount": int(cmat_amount),
+                },
+            ]
+
+            for item in cargo_items:
+                # Split by space to separate the quantity and the commodity.
+                quantity, commodity = item.split()
+
+                # Create a dictionary for each commodity.
+                commodity_object = {
+                    "commodity": commodity,
+                    "amount": int(quantity),
+                }
+
+                # Add the commodity object to the list of cargo items.
+                cargo_items_list.append(commodity_object)
+
+            # Format the row to save.
+            row = {
+                "date": date,
+                "cost": int(cost),
+                "what": what,
+                "commodities": cargo_items_list,
+            }
+
+            salvage_ledger_obj.add_activity(row)
+            salvage_ledger_obj.save_data()
+
+            print()
+            printer.print_success("Salvage activity logged to your notebook!")
+            print()
+
+            salvage_ledger_obj.print_activity_table()
+
+            movement_obj.set_breadcrumb("ledger/salvage")
             movement_obj.set_next_message(
                 "You close your notebook. You are still on your salvage ship."
             )
